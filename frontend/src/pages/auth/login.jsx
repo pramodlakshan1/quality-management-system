@@ -168,7 +168,7 @@ const LoginPage = () => {
             <button
               type="submit"
               className="w-full h-14 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-lg shadow-blue-200 transition-all duration-200"
-                onClick={()=> navigate("/checker-dashboard")}
+                onClick={()=> navigate("/dashboard-midle-layer")}
             >
               Sign In
             </button>

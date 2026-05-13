@@ -5,6 +5,8 @@ import ForgotPasswordPage from "../pages/auth/ForgotPassword";
 import SignupPage from "../pages/auth/Signup";
 import CheckerDashboard from "../pages/dashboard/checker/CheckerDashboard";
 import CheckerDashboardLayout from "../layouts/checker/CheckerDashboardLayout";
+import MiddlLayerDashBoard from "../pages/dashboard/middleLayer/MiddleLayedDashboard";
+import MiddleLayerLayout from "../layouts/middleLayer/MiddleLayerLayout";
 
 const AppRoutes = () => {
     return(
@@ -14,6 +16,7 @@ const AppRoutes = () => {
                 <Route path="forgot-password" element={<ForgotPasswordPage/>}/>
                 <Route path="signup" element={<SignupPage/>}/>
                 <Route path="checker-dashboard" element ={<CheckerDashboardLayout/>}/>
+                <Route path="dashboard-midle-layer" element={<MiddleLayerLayout/>}/>
 
             </Routes>
         </BrowserRouter>
