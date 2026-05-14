@@ -7,6 +7,8 @@ import CheckerDashboard from "../pages/dashboard/checker/CheckerDashboard";
 import CheckerDashboardLayout from "../layouts/checker/CheckerDashboardLayout";
 import MiddlLayerDashBoard from "../pages/dashboard/middleLayer/MiddleLayedDashboard";
 import MiddleLayerLayout from "../layouts/middleLayer/MiddleLayerLayout";
+import ManagerDashboardLayout from "../layouts/toplayer/ManagerDashBoardLayout";
+import SuperDashboardLayout from "../layouts/supperLayout/SupperDashboardLayout";
 
 const AppRoutes = () => {
     return(
@@ -17,7 +19,8 @@ const AppRoutes = () => {
                 <Route path="signup" element={<SignupPage/>}/>
                 <Route path="checker-dashboard" element ={<CheckerDashboardLayout/>}/>
                 <Route path="dashboard-midle-layer" element={<MiddleLayerLayout/>}/>
-
+                <Route path="dashboard-manager" element={<ManagerDashboardLayout/>}/>
+                <Route path="supper-admin-dashboard" element={<SuperDashboardLayout/>}/>
             </Routes>
         </BrowserRouter>
     )
