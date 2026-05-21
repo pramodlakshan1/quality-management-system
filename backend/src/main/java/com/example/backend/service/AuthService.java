@@ -9,8 +9,10 @@ import com.example.backend.dto.LoginResponce;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
+@Builder
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -26,7 +28,7 @@ public class AuthService {
                 request.getPassword()
             )
         );
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = userRepository.findByUserName(request.getUsername()).orElseThrow();
         String token = jwtService.generateToken(
             user,
             user.getCompany().getId().toString(),
@@ -34,7 +36,7 @@ public class AuthService {
         );
         return LoginResponce.builder()
                 .token(token)
-                .username(user.getUserName())
+                .username(user.getUsername())
                 .role(user.getRole().name())
                 .companyName(user.getCompany().getCompanyName())
                 .companyLogo(user.getCompany().getLogo())
