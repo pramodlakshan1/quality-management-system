@@ -1,9 +1,7 @@
 package com.example.backend.entity;
 
-import com.example.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,49 +14,48 @@ import java.util.UUID;
 @Table(name = "users")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)   // Safe equals/hashCode
+@Builder
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
     private UUID id;
 
-    private String fullName;
+    private String firstName;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+    private String lastName;
 
-    private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private String passwordHash;
 
     private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
 
-    // ==================== UserDetails Methods ====================
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role.getSystemRole()));
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return passwordHash;
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

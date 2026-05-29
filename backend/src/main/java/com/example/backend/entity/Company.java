@@ -30,7 +30,7 @@ public class Company {
 
     private String logo;
     
-    private String plane;
+    private String plan;
 
     private boolean  active = true;
     
