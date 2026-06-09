@@ -2,8 +2,7 @@ package com.example.backend.service;
 
 import java.time.LocalDateTime;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.dto.LoginRequest;
@@ -25,8 +24,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TenantRepository tenantRepository;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponce login(LoginRequest request, String tenantFromHeader) {  
         
@@ -46,16 +45,12 @@ public class AuthService {
             throw new RuntimeException("Tenant is inactive");
         }
 
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail(),  
-                request.getPassword()
-            )
-        );
-        
-        User user = userRepository.findByEmailAndTenant_Id(request.getEmail(), tenant.getId())  
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + request.getEmail()));
-
+        User user = userRepository
+        .findByEmailAndTenant_Id(request.getEmail(), tenant.getId())
+        .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        throw new RuntimeException("Invalid credentials");
+}
         if (!user.isActive()) {
             throw new RuntimeException("User is inactive");
         }

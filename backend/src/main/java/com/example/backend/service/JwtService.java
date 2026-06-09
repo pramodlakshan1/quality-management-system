@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +60,7 @@ public class JwtService {
             )
             .signWith(getKey())
             .compact();
-}
+    }
     
 
     public String extractUsername(String token) {
@@ -84,6 +85,20 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+    public UUID extractTenantIdAsUUID(
+            String token
+    ){
+        return UUID.fromString(
+                extractTenantId(token)
+        );
+    }
+
+    public String extractPlan(
+            String token
+    ){
+        return extractAllClaims(token)
+                .get("plan", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

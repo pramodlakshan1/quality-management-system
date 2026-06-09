@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.example.backend.filter.JwtAuthFilter;
 import com.example.backend.filter.TenantFilter;
+import com.example.backend.service.JwtAuthenticationEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,25 +31,28 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
     private final TenantFilter tenantFilter;
-    
+    private final JwtAuthenticationEntryPoint entryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
+    http
+        .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth 
-                .requestMatchers("/api/auth/**", "/api/auth/login", "/api/auth/refresh").permitAll()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(ex -> 
+                ex.authenticationEntryPoint(entryPoint)
+            );
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

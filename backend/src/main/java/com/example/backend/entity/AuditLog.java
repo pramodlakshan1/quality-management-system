@@ -1,8 +1,8 @@
 package com.example.backend.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,24 +14,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table (name = "companies")
+@Table(name = "audit_logs")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
+public class AuditLog {
 
-public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable=false)
-    private String companyName;
+    private String username;
 
-    private String logo;
-    
-    private String plan;
+    private String action;
 
-    private boolean  active = true;
-    
+    private String tenantId;
+
+    private LocalDateTime createdAt;
 }
