@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.dto.LoginRequest;
 import com.example.backend.dto.LoginResponce;
+import com.example.backend.dto.LogoutRequest;
 import com.example.backend.dto.RefreshTokenRequest;
 import com.example.backend.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,4 +40,21 @@ public class AuthController {
     ) {
         return ResponseEntity.ok(authService.refreshToken(request));
     }
+
+   @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequest request,
+                                    @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        String accessToken = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            accessToken = authHeader.replace("Bearer ", "").trim();
+        }
+
+        System.out.println("Received Refresh Token: " + request.getRefreshToken()); // Debug
+
+        authService.logout(request.getRefreshToken(), accessToken);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

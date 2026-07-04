@@ -17,18 +17,23 @@ public class TenantFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
-        
+
         String tenantId = request.getHeader("X-Tenant-ID");
+        
         if (tenantId != null && !tenantId.isEmpty()) {
             TenantContext.setTenantId(tenantId);
+            System.out.println("TenantFilter → Set tenant: " + tenantId);
+        } else {
+            System.out.println("TenantFilter → No X-Tenant-ID header found");
         }
-        
+
         try {
             filterChain.doFilter(request, response);
         } finally {
+            System.out.println("TenantFilter → Cleared tenant context");
             TenantContext.clear();
         }
     }

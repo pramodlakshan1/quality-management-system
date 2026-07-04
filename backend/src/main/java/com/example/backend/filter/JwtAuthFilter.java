@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.backend.context.TenantContext;
+import com.example.backend.exception.InvalidCredentialsException;
 import com.example.backend.service.CustomUserDetailsService;
 import com.example.backend.service.JwtService;
+import com.example.backend.service.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -48,20 +51,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        
+
         try {
             final String username = jwtService.extractUsername(jwt);
-            
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
-                    // Extract and set tenant only if token is valid
+                    
+                    if (tokenBlacklistService.isBlacklisted(jwt)) {
+                        throw new InvalidCredentialsException("Token has been revoked");
+    }
+
+                    // === CRITICAL: Set tenant from JWT ===
                     String tenantId = jwtService.extractTenantId(jwt);
                     if (tenantId != null) {
                         TenantContext.setTenantId(tenantId);
                     }
-                    
+
                     UsernamePasswordAuthenticationToken authToken = 
                         new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -74,10 +83,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Log error but don't throw - let the request continue
             System.err.println("JWT validation error: " + e.getMessage());
+            // Do not clear context here - let TenantFilter handle cleanup
         }
 
+        // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 }
